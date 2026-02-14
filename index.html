@@ -1,20 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <base href="/bhagyag_web_application/">
+  <base href="/">
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=Edge">
   <meta name="description" content="Bhagya G - Your personal horoscope application">
 
-  <!-- ✅ Fix PWA 404 on reopen -->
-  <script>
-    if (window.location.pathname === '/' || 
-        window.location.pathname === '/index.html') {
-      window.location.replace(
-        'https://playaug2014-lab.github.io/bhagyag_web_application/'
-      );
-    }
-  </script>
+  <!-- ✅ FIX 1: Viewport tag — REQUIRED for Safari to render Flutter correctly -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
   <!-- ✅ PWA - Android -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -35,9 +28,38 @@
   <!-- ✅ Favicon & Manifest -->
   <link rel="icon" type="image/png" href="favicon.png"/>
   <title>Bhagya G</title>
-  <link rel="manifest" href="./manifest.json">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- ✅ FIX 2: Force Safari-compatible webkit scrolling on flutter-view -->
+  <style>
+    flutter-view, flt-glass-pane, flt-scene, flt-scene-host {
+      -webkit-overflow-scrolling: touch !important;
+    }
+    /* Prevent blank grey boxes in Safari for absolutely positioned Flutter elements */
+    body {
+      -webkit-text-size-adjust: 100%;
+      overflow: hidden;
+    }
+  </style>
 </head>
 <body>
+
+<!-- ✅ FIX 3: Flutter bootstrap with HTML renderer forced for Safari compatibility -->
+<script>
+  // Detect Safari (not Chrome on iOS)
+  var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  var isFirefox = /Firefox/.test(navigator.userAgent);
+
+  // Force HTML renderer on Safari/iOS/Firefox — CanvasKit causes blank sections
+  if (isSafari || isIOS || isFirefox) {
+    window.flutterConfiguration = {
+      renderer: "html"
+    };
+  }
+  // Chrome/Desktop: use auto (CanvasKit for performance)
+  // else leave flutterConfiguration unset so Flutter picks the best default
+</script>
 
 <!-- ✅ Flutter -->
 <script src="flutter_bootstrap.js" async></script>
@@ -56,11 +78,13 @@
 
     if (isIOS) {
       if (isChrome) {
-        showChromeBanner();
+        showChromeBanner();   // Tell user to open in Safari
       } else if (isSafari) {
-        showSafariGuide();
+        showSafariGuide();    // Show Add to Home Screen guide
       }
     }
+
+    // Android / Desktop - browser handles this automatically
   }
 
   function showChromeBanner() {
@@ -161,6 +185,7 @@
     navigator.clipboard.writeText(window.location.href).then(() => {
       alert('✅ Link copied!\n\nNow open Safari and paste the link in the address bar.');
     }).catch(() => {
+      // Fallback if clipboard fails
       prompt('Copy this link and open in Safari:', window.location.href);
     });
   }
