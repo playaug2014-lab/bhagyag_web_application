@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="/bhagyag_web_application/">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <meta name="description" content="Bhagya G - Your personal horoscope application">
+
+  <!-- ✅ Fix PWA 404 on reopen -->
+  <script>
+    if (window.location.pathname === '/' || 
+        window.location.pathname === '/index.html') {
+      window.location.replace(
+        'https://playaug2014-lab.github.io/bhagyag_web_application/'
+      );
+    }
+  </script>
+
+  <!-- ✅ PWA - Android -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0175C2">
+
+  <!-- ✅ PWA - iOS Critical -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Bhagya G">
+
+  <!-- ✅ iOS Icons (iOS ignores manifest.json icons!) -->
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="icons/Icon-192.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/Icon-192.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="icons/Icon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/Icon-192.png">
+
+  <!-- ✅ Favicon & Manifest -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+  <title>Bhagya G</title>
+  <link rel="manifest" href="./manifest.json">
+</head>
+<body>
+
+<!-- ✅ Flutter -->
+<script src="flutter_bootstrap.js" async></script>
+
+<!-- ✅ PWA Install Prompt -->
+<script>
+  function handlePWAInstall() {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isStandalone = window.navigator.standalone === true;
+    const isChrome = /CriOS/.test(navigator.userAgent);
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    const dismissed = localStorage.getItem('pwaBannerDismissed');
+
+    // Already installed or dismissed
+    if (isStandalone || dismissed) return;
+
+    if (isIOS) {
+      if (isChrome) {
+        showChromeBanner();
+      } else if (isSafari) {
+        showSafariGuide();
+      }
+    }
+  }
+
+  function showChromeBanner() {
+    const el = document.createElement('div');
+    el.id = 'pwa-banner';
+    el.innerHTML = `
+      <div style="
+        position:fixed; bottom:0; left:0; right:0;
+        background:#ffffff; padding:16px 16px 30px 16px;
+        box-shadow:0 -2px 12px rgba(0,0,0,0.15);
+        z-index:9999; font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+        border-radius:16px 16px 0 0;
+      ">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+          <img src="icons/Icon-192.png" width="44" height="44"
+            style="border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.2)"/>
+          <div>
+            <div style="font-weight:700;font-size:15px;color:#000;">Bhagya G</div>
+            <div style="font-size:12px;color:#888;">Install for better experience</div>
+          </div>
+        </div>
+        <p style="font-size:13px;color:#555;margin:0 0 14px 0;">
+          📌 Open this page in <strong>Safari</strong> to install the app on your Home Screen
+        </p>
+        <div style="display:flex;gap:10px;">
+          <button onclick="copyAndOpen()" style="
+            flex:1; padding:13px; background:#0175C2; color:#fff;
+            border:none; border-radius:12px; font-size:14px;
+            font-weight:600; cursor:pointer;
+          ">Copy Link → Open in Safari</button>
+          <button onclick="dismissBanner()" style="
+            padding:13px 16px; background:#f2f2f7; color:#333;
+            border:none; border-radius:12px; font-size:14px; cursor:pointer;
+          ">Later</button>
+        </div>
+      </div>`;
+    document.body.appendChild(el);
+  }
+
+  function showSafariGuide() {
+    const el = document.createElement('div');
+    el.id = 'pwa-banner';
+    el.innerHTML = `
+      <div style="
+        position:fixed; bottom:20px; left:16px; right:16px;
+        background:#1c1c1e; color:#fff;
+        border-radius:16px; padding:20px;
+        box-shadow:0 4px 20px rgba(0,0,0,0.3);
+        z-index:9999; font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+      ">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <img src="icons/Icon-192.png" width="36" height="36"
+              style="border-radius:8px;"/>
+            <span style="font-weight:700;font-size:15px;">Install Bhagya G</span>
+          </div>
+          <button onclick="dismissBanner()" style="
+            background:none;border:none;color:#aaa;
+            font-size:22px;cursor:pointer;line-height:1;
+          ">✕</button>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+          <div style="
+            background:#0175C2;border-radius:50%;
+            min-width:28px;height:28px;
+            display:flex;align-items:center;justify-content:center;
+            font-size:13px;font-weight:700;
+          ">1</div>
+          <span style="font-size:14px;color:#ddd;">
+            Tap the <strong style="color:#fff;">Share ⎋</strong> button at the bottom of Safari
+          </span>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+          <div style="
+            background:#0175C2;border-radius:50%;
+            min-width:28px;height:28px;
+            display:flex;align-items:center;justify-content:center;
+            font-size:13px;font-weight:700;
+          ">2</div>
+          <span style="font-size:14px;color:#ddd;">
+            Tap <strong style="color:#fff;">"Add to Home Screen"</strong>
+          </span>
+        </div>
+
+        <div style="
+          text-align:center;font-size:12px;color:#888;
+          border-top:1px solid #333;padding-top:12px;
+        ">
+          ↓ Share button is at the bottom of your screen
+        </div>
+      </div>`;
+    document.body.appendChild(el);
+  }
+
+  function copyAndOpen() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      alert('✅ Link copied!\n\nNow open Safari and paste the link in the address bar.');
+    }).catch(() => {
+      prompt('Copy this link and open in Safari:', window.location.href);
+    });
+  }
+
+  function dismissBanner() {
+    document.getElementById('pwa-banner')?.remove();
+    localStorage.setItem('pwaBannerDismissed', 'true');
+  }
+
+  window.addEventListener('load', handlePWAInstall);
+</script>
+
+</body>
+</html>
