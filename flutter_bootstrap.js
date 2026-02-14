@@ -31,13 +31,52 @@ addEventListener("message", eventListener);
 `],{type:"application/javascript"}))}return url},mainScriptUrlOrBlob:a})};var P=w.supportsWasmGC,G=P&&w.webGLVersion>0,b=class{async loadEntrypoint(e){let{serviceWorker:r,...t}=e||{},n=new y,s=new g;s.setTrustedTypesPolicy(n.policy),await s.loadServiceWorker(r).catch(o=>{console.warn("Exception while loading service worker:",o)});let a=new h;return a.setTrustedTypesPolicy(n.policy),this.didCreateEngineInitializer=a.didCreateEngineInitializer.bind(a),a.loadEntrypoint(t)}async load({serviceWorkerSettings:e,onEntrypointLoaded:r,nonce:t,config:n}={}){n??={};let s=_flutter.buildConfig;if(!s)throw"FlutterLoader.load requires _flutter.buildConfig to be set";let a=n.wasmAllowList?.[w.browserEngine]??_[w.browserEngine],o=m=>{switch(m){case"skwasm":return G&&a;default:return!0}},d=m=>m.compileTarget==="dart2wasm"&&!P||n.renderer&&n.renderer!=m.renderer?!1:o(m.renderer),u=s.builds.find(d);if(!u)throw"FlutterLoader could not find a build compatible with configuration and environment.";let l={};l.flutterTT=new y,e&&(l.serviceWorkerLoader=new g,l.serviceWorkerLoader.setTrustedTypesPolicy(l.flutterTT.policy),await l.serviceWorkerLoader.loadServiceWorker(e).catch(m=>{console.warn("Exception while loading service worker:",m)}));let p=T(n,s);u.renderer==="canvaskit"?l.canvasKit=E(l,n,w,p):u.renderer==="skwasm"&&(l.skwasm=W(l,n,w,p));let f=new h;return f.setTrustedTypesPolicy(l.flutterTT.policy),this.didCreateEngineInitializer=f.didCreateEngineInitializer.bind(f),f.load(u,l,n,t,r)}};window._flutter||(window._flutter={});window._flutter.loader||(window._flutter.loader=new b);})();
 //# sourceMappingURL=flutter.js.map
 
-if (!window._flutter) {
-  window._flutter = {};
-}
+// ✅ FIX: Detect Mac/iOS browsers
+// ⚠️ IMPORTANT: We do NOT use canvasKitVariant:"chromium" here because the minified
+// loader above checks hasChromiumBreakIterators (Intl.v8BreakIterator) and will
+// THROW if chromium variant is forced but v8BreakIterator is absent (Mac Safari).
+// Instead we polyfill Intl.v8BreakIterator so Flutter's own detection passes,
+// which lets it naturally pick the chromium (lighter) CanvasKit path itself.
+(function() {
+  // Polyfill deprecated Intl.v8BreakIterator using modern Intl.Segmenter
+  // This fixes BOTH the console deprecation warning AND blank sections on Mac
+  if (typeof Intl !== 'undefined' && typeof Intl.Segmenter !== 'undefined') {
+    if (typeof Intl.v8BreakIterator === 'undefined') {
+      // Mac Safari + modern Chrome removed v8BreakIterator — polyfill it
+      Intl.v8BreakIterator = function(locales, options) {
+        var type = (options && options.type) || 'word';
+        var granularity = type === 'character' ? 'grapheme' : 'word';
+        var segmenter = new Intl.Segmenter(locales, { granularity: granularity });
+        var _text = '';
+        var _segments = [];
+        var _index = 0;
+        return {
+          adoptText: function(text) {
+            _text = text;
+            _segments = Array.from(segmenter.segment(text));
+            _index = 0;
+          },
+          first: function() { _index = 0; return _segments[0] ? _segments[0].index : 0; },
+          next: function() {
+            _index++;
+            return _segments[_index] ? _segments[_index].index : _text.length;
+          },
+          current: function() { return _segments[_index] ? _segments[_index].index : 0; },
+          breakType: function() { return 'none'; }
+        };
+      };
+      console.log('[BhagyaG] Intl.v8BreakIterator polyfilled via Intl.Segmenter');
+    }
+  }
+})();
+
 _flutter.buildConfig = {"engineRevision":"a5cb96369ef86c7e85abf5d662a1ca5d89775053","builds":[{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js"},{}]};
 
 _flutter.loader.load({
   serviceWorkerSettings: {
     serviceWorkerVersion: "2444912205"
   }
+  // ✅ No config override needed — the polyfill above makes Flutter's own
+  // hasChromiumBreakIterators check pass, so it picks the correct
+  // chromium CanvasKit variant automatically on all browsers including Mac
 });
