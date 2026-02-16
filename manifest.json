@@ -1,13 +1,13 @@
 {
-    "name": "bhagyag",
-    "short_name": "bhagyag",
-    "start_url": "/",
-    "scope": "/",
+    "name": "Bhagya G",
+    "short_name": "Bhagya G",
+    "start_url": "/bhagyag_web_application/",
+    "scope": "/bhagyag_web_application/",
     "display": "standalone",
     "display_override": ["standalone", "minimal-ui"],
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Bhagya G - Your personal horoscope application",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

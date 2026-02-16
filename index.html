@@ -1,10 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <base href="/">
+  <base href="/bhagyag_web_application/">
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=Edge">
   <meta name="description" content="Bhagya G - Your personal horoscope application">
+
+  <!-- ✅ Fix PWA 404 on reopen -->
+  <script>
+    if (window.location.pathname === '/' || 
+        window.location.pathname === '/index.html') {
+      window.location.replace(
+        'https://playaug2014-lab.github.io/bhagyag_web_application/'
+      );
+    }
+  </script>
 
   <!-- ✅ PWA - Android -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -25,7 +35,7 @@
   <!-- ✅ Favicon & Manifest -->
   <link rel="icon" type="image/png" href="favicon.png"/>
   <title>Bhagya G</title>
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="./manifest.json">
 </head>
 <body>
 
@@ -46,13 +56,11 @@
 
     if (isIOS) {
       if (isChrome) {
-        showChromeBanner();   // Tell user to open in Safari
+        showChromeBanner();
       } else if (isSafari) {
-        showSafariGuide();    // Show Add to Home Screen guide
+        showSafariGuide();
       }
     }
-
-    // Android / Desktop - browser handles this automatically
   }
 
   function showChromeBanner() {
@@ -153,7 +161,6 @@
     navigator.clipboard.writeText(window.location.href).then(() => {
       alert('✅ Link copied!\n\nNow open Safari and paste the link in the address bar.');
     }).catch(() => {
-      // Fallback if clipboard fails
       prompt('Copy this link and open in Safari:', window.location.href);
     });
   }
