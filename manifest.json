@@ -1,8 +1,8 @@
 {
     "name": "bhagyag",
     "short_name": "bhagyag",
-    "start_url": "/",
-    "scope": "/",
+    "start_url": "/bhagyag_web_application/",
+    "scope": "/bhagyag_web_application/",
     "display": "standalone",
     "display_override": ["standalone", "minimal-ui"],
     "background_color": "#0175C2",
